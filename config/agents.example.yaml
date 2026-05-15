@@ -1,0 +1,34 @@
+agents:
+  - id: router
+    name: Bot A - Director
+    telegram: "@YourRouterBot"
+    kind: bot
+    role: Receives your orders, divides work, and decides where tasks go.
+
+  - id: research
+    name: Research Bot
+    telegram: "@YourResearchBot"
+    kind: bot
+    role: Handles research tasks.
+
+  - id: writer
+    name: Writing Bot
+    telegram: "@YourWritingBot"
+    kind: bot
+    role: Writes and edits text.
+
+  - id: media
+    name: Media Bot
+    telegram: "@YourMediaBot"
+    kind: bot
+    role: Handles images and audio later.
+
+  - id: human_helper
+    name: Human Helper
+    telegram: "@RealTelegramUsername"
+    kind: human
+    role: Optional real person who can receive delegated tasks.
+
+owner_usernames:
+  - "@YourPersonalTelegramUsername"
+

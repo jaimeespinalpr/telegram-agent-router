@@ -1,0 +1,2 @@
+"""Telegram agent router application."""
+
