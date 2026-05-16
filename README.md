@@ -75,7 +75,13 @@ Abre `http://127.0.0.1:8000`.
 
 ## GitHub y despliegue
 
-GitHub guardará el código, pero el router necesita estar corriendo en un servidor para escuchar Telegram. Para producción recomiendo un VPS o Railway/Render con disco persistente para guardar la sesión de Telethon.
+GitHub guardará el código y GitHub Pages publica una página de entrada estática en:
+
+```text
+https://jaimeespinalpr.github.io/telegram-agent-router/
+```
+
+Importante: GitHub Pages no ejecuta Python, FastAPI ni Telethon. La página de Pages sirve como launcher público; el router real necesita estar corriendo en un servidor para escuchar Telegram. Para producción recomiendo Render, Railway, Fly.io o una VPS con disco persistente para guardar la sesión de Telethon.
 
 Variables necesarias:
 
@@ -94,6 +100,8 @@ Con Docker:
 docker build -t telegram-agent-router .
 docker run --env-file .env -p 8000:8000 telegram-agent-router
 ```
+
+Cuando tengas el backend público, abre la página de Pages, pega la URL HTTPS del backend y usa el botón "Abrir panel".
 
 ## Limitaciones
 

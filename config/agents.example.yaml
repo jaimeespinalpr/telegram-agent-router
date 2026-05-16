@@ -1,34 +1,95 @@
 agents:
   - id: router
-    name: Bot A - Director
-    telegram: "@YourRouterBot"
+    name: ChattyDA Bot
+    telegram: "@chattydabot"
     kind: bot
-    role: Receives your orders, divides work, and decides where tasks go.
+    role: Bot principal, director, supervisor y router central.
+    aliases:
+      - chatty
+      - director
+      - supervisor
+      - router
+    keywords:
+      - coordina
+      - decidir
+      - supervisor
+      - resumen
+      - divide
 
-  - id: research
-    name: Research Bot
-    telegram: "@YourResearchBot"
+  - id: multi
+    name: MultiDA Bot
+    telegram: "@multida_bot"
     kind: bot
-    role: Handles research tasks.
+    role: Estrategia, musica, marketing, contenido y crecimiento.
+    aliases:
+      - multida
+      - multi
+      - marketing
+      - estrategia
+    keywords:
+      - musica
+      - cancion
+      - ep
+      - artista
+      - promocionar
+      - promocion
+      - marketing
+      - contenido
+      - caption
+      - campana
+      - redes
 
-  - id: writer
-    name: Writing Bot
-    telegram: "@YourWritingBot"
+  - id: ardida
+    name: ArdiDA Bot
+    telegram: "@ardidabot"
     kind: bot
-    role: Writes and edits text.
+    role: Creatividad, ideas, diseno de dialogo, revision editorial y apoyo visual.
+    aliases:
+      - ardida
+      - ardi
+      - creativo
+      - creatividad
+    keywords:
+      - ardida
+      - ardi
+      - creativo
+      - creatividad
+      - idea
+      - ideas
+      - diseno
 
-  - id: media
-    name: Media Bot
-    telegram: "@YourMediaBot"
+  - id: prpagyda
+    name: PRPagyDA Bot
+    telegram: "@prpagydabot"
     kind: bot
-    role: Handles images and audio later.
+    role: Comunicaciones, PR, comunidad, medios e influencers.
+    aliases:
+      - prpagyda
+      - prpagy
+      - pr
+    keywords:
+      - prpagyda
+      - pagyda
+      - pr
+      - comunicaciones
+      - comunidad
+      - medios
 
-  - id: human_helper
-    name: Human Helper
-    telegram: "@RealTelegramUsername"
-    kind: human
-    role: Optional real person who can receive delegated tasks.
+  - id: prjimenezda
+    name: PRJimenezDA Bot
+    telegram: "@prjimenezdabot"
+    kind: bot
+    role: Plan editorial, calendario, escritura y coordinacion.
+    aliases:
+      - prjimenezda
+      - jimenez
+      - editorial
+    keywords:
+      - prjimenezda
+      - jimenez
+      - editorial
+      - escribir
+      - calendario
 
 owner_usernames:
-  - "@YourPersonalTelegramUsername"
-
+  - "@jaimeespinalpr"

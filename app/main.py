@@ -1279,12 +1279,13 @@ async def index(request: Request, service: TelegramRouterService = Depends(get_s
                 const H = 900;
                 const state = window.__SCENE_STATE__;
                 const rooms = {{
-                  router: {{ x: 35, y: 35, w: 350, h: 250, color: "#3c5f34", accent: "#78f09b", hair: "#6b351d", shirt: "#49d069", skin: "#f0b17a", name: "Director", emoji: "A" }},
-                  multi: {{ x: 735, y: 35, w: 350, h: 250, color: "#263e6f", accent: "#68a8ff", hair: "#1687ff", shirt: "#3f8cff", skin: "#f0b17a", name: "Codigo", emoji: "B" }},
-                  ardida: {{ x: 35, y: 590, w: 350, h: 250, color: "#66345f", accent: "#ff74d4", hair: "#ff5fdc", shirt: "#ff65c8", skin: "#f0b17a", name: "Creativo", emoji: "C" }},
-                  prpagyda: {{ x: 735, y: 590, w: 350, h: 250, color: "#245f5d", accent: "#52e6f2", hair: "#14b9a8", shirt: "#22d1a5", skin: "#f0b17a", name: "Analitica", emoji: "D" }},
-                  prjimenezda: {{ x: 385, y: 632, w: 350, h: 220, color: "#76582a", accent: "#ffd15a", hair: "#2b191b", shirt: "#ffc52f", skin: "#b9764f", name: "Soporte", emoji: "E" }},
+                  router: {{ x: 30, y: 28, w: 350, h: 272, color: "#315830", accent: "#78f09b", hair: "#6b351d", shirt: "#49d069", skin: "#f0b17a", name: "Chattydabot", role: "DIRECTOR", tag: "ROUTER", emoji: "A" }},
+                  multi: {{ x: 740, y: 28, w: 350, h: 272, color: "#553060", accent: "#b87cff", hair: "#9150ff", shirt: "#8657ff", skin: "#f0b17a", name: "Multida_bot", role: "CONTENT LAB", tag: "MEDIA", emoji: "B" }},
+                  prjimenezda: {{ x: 30, y: 575, w: 350, h: 272, color: "#71354b", accent: "#ff74d4", hair: "#4c2a22", shirt: "#f15b8e", skin: "#f0b17a", name: "prjimenezdabot", role: "WRITE PLAN COORDINATE", tag: "EDITORIAL", emoji: "C" }},
+                  prpagyda: {{ x: 740, y: 575, w: 350, h: 272, color: "#245f5d", accent: "#52e6f2", hair: "#14b9a8", shirt: "#22d1a5", skin: "#f0b17a", name: "prpagydabot", role: "COMMUNICATIONS", tag: "PR", emoji: "D" }},
+                  ardida: {{ x: 386, y: 650, w: 348, h: 176, color: "#6b4a24", accent: "#ffd15a", hair: "#2b191b", shirt: "#ffc52f", skin: "#b9764f", name: "ardidabot", role: "CREATIVE QA", tag: "IDEAS", emoji: "E" }},
                 }};
+                const commandHub = {{ x: 392, y: 318, w: 336, h: 262 }};
                 const agentNames = Object.fromEntries(state.agents.map((agent) => [agent.id, agent.telegram]));
                 let agentStates = state.agentStates || {{}};
                 let communicationMode = state.mode || "ACTIVE_MODE";
@@ -1337,10 +1338,22 @@ async def index(request: Request, service: TelegramRouterService = Depends(get_s
 
                 function radialLight(x, y, r, color, alpha = .22) {{
                   const light = ctx.createRadialGradient(x, y, 0, x, y, r);
-                  light.addColorStop(0, color.replace(")", `, ${{alpha}})`).replace("rgb", "rgba"));
+                  light.addColorStop(0, withAlpha(color, alpha));
                   light.addColorStop(1, "rgba(0,0,0,0)");
                   ctx.fillStyle = light;
                   ctx.fillRect(x - r, y - r, r * 2, r * 2);
+                }}
+
+                function withAlpha(color, alpha) {{
+                  if (color.startsWith("#")) {{
+                    const clean = color.replace("#", "");
+                    const n = parseInt(clean, 16);
+                    const r = (n >> 16) & 255;
+                    const g = (n >> 8) & 255;
+                    const b = n & 255;
+                    return `rgba(${{r}}, ${{g}}, ${{b}}, ${{alpha}})`;
+                  }}
+                  return color.replace(")", `, ${{alpha}})`).replace("rgb", "rgba");
                 }}
 
                 function drawVignette() {{
@@ -1374,10 +1387,16 @@ async def index(request: Request, service: TelegramRouterService = Depends(get_s
                 }}
 
                 function drawFloor() {{
-                  softShadow(W / 2, 624, 390, 70, .24);
-                  px(305, 248, 510, 360, "#4d3440", "#2a1b22", 8);
-                  for (let y = 260; y < 594; y += 28) {{
-                    for (let x = 318; x < 805; x += 64) {{
+                  softShadow(W / 2, 624, 430, 72, .25);
+                  materialRect(300, 272, 520, 356, "#6f432c", 4, 14);
+                  px(300, 272, 520, 356, "rgba(255,255,255,.02)", "#2a1b22", 8);
+                  materialRect(390, 96, 340, 184, "#72452c", 5, 14);
+                  px(390, 96, 340, 184, "rgba(255,255,255,.02)", "#2a1b22", 7);
+                  materialRect(292, 742, 536, 136, "#6a3f2b", 6, 14);
+                  px(292, 742, 536, 136, "rgba(255,255,255,.02)", "#2a1b22", 7);
+                  for (let y = 116; y < 868; y += 28) {{
+                    for (let x = 316; x < 810; x += 64) {{
+                      if (y > 632 && y < 742) continue;
                       const base = (x + y) % 3 ? "#a76031" : "#92502b";
                       materialRect(x, y, 62, 26, base, x + y, 8);
                       px(x, y, 62, 2, "rgba(255,230,170,.08)");
@@ -1394,6 +1413,50 @@ async def index(request: Request, service: TelegramRouterService = Depends(get_s
                   px(455, 360, 210, 112, "rgba(255,209,90,.18)", "#4d3440", 7);
                   materialRect(505, 384, 110, 65, "rgba(82,230,242,.14)", 19, 7);
                   px(505, 384, 110, 65, "rgba(82,230,242,.06)", "#5f3f4a", 5);
+                  drawHallwayDetails();
+                }}
+
+                function drawHallwayDetails() {{
+                  drawMissionBoard(457, 118);
+                  drawSofa(520, 174);
+                  drawVending(678, 158);
+                  drawWaterCooler(438, 162);
+                  drawDoor(360, 300, "left");
+                  drawDoor(732, 300, "right");
+                  drawDoor(360, 548, "left");
+                  drawDoor(732, 548, "right");
+                  drawCoffeeBar(760, 760);
+                  drawFoosball(338, 772);
+                  drawWelcomeMat(516, 842);
+                  drawArrow(395, 281, 170, "#78f09b");
+                  drawArrow(725, 281, 0, "#68a8ff");
+                  drawArrow(394, 495, 180, "#78f09b");
+                  drawArrow(728, 495, 0, "#68a8ff");
+                  drawArrow(548, 287, 90, "#ffd15a");
+                  drawArrow(552, 628, 90, "#ffd15a");
+                  drawPlant(422, 194, .85);
+                  drawPlant(704, 194, .85);
+                  drawPlant(412, 715, .9);
+                  drawPlant(716, 715, .9);
+                }}
+
+                function drawArrow(x, y, angle, color) {{
+                  ctx.save();
+                  ctx.translate(x, y);
+                  ctx.rotate(angle * Math.PI / 180);
+                  ctx.strokeStyle = color;
+                  ctx.lineWidth = 5;
+                  ctx.setLineDash([14, 10]);
+                  ctx.shadowColor = color;
+                  ctx.shadowBlur = 8;
+                  ctx.beginPath();
+                  ctx.moveTo(-46, 0);
+                  ctx.lineTo(46, 0);
+                  ctx.stroke();
+                  ctx.setLineDash([]);
+                  px(34, -8, 18, 16, color);
+                  ctx.restore();
+                  ctx.shadowBlur = 0;
                 }}
 
                 function drawRoom(id, room, now) {{
@@ -1419,6 +1482,7 @@ async def index(request: Request, service: TelegramRouterService = Depends(get_s
                     px(room.x + 14, room.y + 14, room.w - 28, room.h - 28, "rgba(255,255,255,.05)", room.accent, 4);
                     ctx.shadowBlur = 0;
                   }}
+                  drawRoomLabel(room);
                   drawProps(room, id, now);
                   drawSprite(room.x + room.w * .46, room.y + room.h - 126, room, id, now, glow, agentState);
                   px(room.x + 18, room.y + room.h - 42, room.w - 36, 28, "rgba(15,12,23,.82)", "rgba(255,255,255,.16)", 3);
@@ -1426,14 +1490,26 @@ async def index(request: Request, service: TelegramRouterService = Depends(get_s
                   text(agentState, room.x + room.w - 28, room.y + room.h - 36, 13, room.accent, "right");
                 }}
 
+                function drawRoomLabel(room) {{
+                  px(room.x + 82, room.y + 8, room.w - 164, 42, "#2e2437", "#15111a", 5);
+                  px(room.x + 90, room.y + 16, room.w - 180, 26, "rgba(255,209,90,.14)", room.accent, 2);
+                  text(room.name, room.x + room.w / 2, room.y + 18, 18, "#f7dca0", "center");
+                  text(room.role, room.x + room.w / 2, room.y + 62, 12, room.accent, "center");
+                }}
+
                 function drawProps(room, id, now) {{
                   const flicker = Math.floor(now / 220) % 2;
+                  softShadow(room.x + 196, room.y + room.h - 22, 116, 14, .18);
                   px(room.x + 26, room.y + 45, 112, 12, "#5b3222", "#2a1b22", 3);
-                  px(room.x + 34, room.y + 18, 24, 34, "#d59b42", "#2a1b22", 3);
-                  px(room.x + 66, room.y + 18, 24, 34, "#68a8ff", "#2a1b22", 3);
+                  materialRect(room.x + 34, room.y + 18, 24, 34, "#d59b42", 7, 6);
+                  px(room.x + 34, room.y + 18, 24, 34, "rgba(255,255,255,.04)", "#2a1b22", 3);
+                  materialRect(room.x + 66, room.y + 18, 24, 34, "#68a8ff", 8, 6);
+                  px(room.x + 66, room.y + 18, 24, 34, "rgba(255,255,255,.04)", "#2a1b22", 3);
                   px(room.x + 100, room.y + 24, 28, 26, room.accent, "#2a1b22", 3);
                   px(room.x + room.w - 82, room.y + 32, 50, 44, "#10182a", "#2a1b22", 4);
-                  px(room.x + room.w - 70, room.y + 48, 26, 8, room.accent);
+                  px(room.x + room.w - 72, room.y + 42, 30, 4, "rgba(255,255,255,.28)");
+                  px(room.x + room.w - 70, room.y + 50, 26, 8, room.accent);
+                  px(room.x + room.w - 70, room.y + 62, 18, 5, "#f7ead5");
                   px(room.x + 168, room.y + 28, 52, 42, "#f0dfbd", "#2a1b22", 4);
                   px(room.x + 180, room.y + 40, 28, 5, room.accent);
                   px(room.x + 180, room.y + 52, 18, 5, "#e85b75");
@@ -1447,11 +1523,42 @@ async def index(request: Request, service: TelegramRouterService = Depends(get_s
                   px(room.x + 266, room.y + room.h - 132, 48, 38, "#101827", "#2a1b22", 4);
                   px(room.x + 274, room.y + room.h - 124, 30, 20, flicker ? "#f7ead5" : room.accent);
                   px(room.x + 196, room.y + room.h - 62, 92, 14, "#1a2130", "#2a1b22", 3);
+                  for (let i = 0; i < 5; i += 1) {{
+                    const dustX = room.x + 42 + ((i * 71 + Math.floor(now / 70)) % (room.w - 84));
+                    const dustY = room.y + 38 + ((i * 47 + Math.floor(now / 120)) % (room.h - 115));
+                    px(dustX, dustY, 2, 2, "rgba(255,255,255,.12)");
+                  }}
                   if (id === "router") drawCrown(room.x + 194, room.y + 80);
                   if (id === "multi") drawCodeBars(room.x + 172, room.y + 82, room.accent);
                   if (id === "ardida") drawPalette(room.x + 180, room.y + 82);
                   if (id === "prpagyda") drawChart(room.x + 176, room.y + 82);
                   if (id === "prjimenezda") drawQuestion(room.x + 184, room.y + 76, room.accent);
+                  if (id === "multi") drawContentPlan(room.x + room.w - 92, room.y + 86);
+                  if (id === "prpagyda") drawCommunicationsBoard(room.x + 110, room.y + 82);
+                  if (id === "prjimenezda") drawCalendar(room.x + 100, room.y + 84);
+                }}
+
+                function drawCommandHub(now) {{
+                  const hub = commandHub;
+                  softShadow(hub.x + hub.w / 2, hub.y + hub.h + 14, 210, 35, .36);
+                  px(hub.x, hub.y, hub.w, hub.h, "#4b3340", "#211722", 8);
+                  materialRect(hub.x + 16, hub.y + 20, hub.w - 32, hub.h - 38, "#6c3d25", 11, 12);
+                  px(hub.x + 88, hub.y - 6, 160, 42, "#1f3768", "#12101a", 5);
+                  text("Jaimeespinalpr", hub.x + hub.w / 2, hub.y + 4, 20, "#f7ead5", "center");
+                  px(hub.x + 126, hub.y + 36, 84, 25, "#2e2b66", "#15111a", 4);
+                  text("COMMAND HUB", hub.x + hub.w / 2, hub.y + 42, 12, "#f7dca0", "center");
+                  drawStatusBoard(hub.x + 30, hub.y + 48);
+                  drawPriorityBoard(hub.x + 238, hub.y + 48);
+                  drawWorldScreens(hub.x + 103, hub.y + 64, now);
+                  drawDesk(hub.x + 58, hub.y + 132, hub.w - 116, 68);
+                  drawOwnerAvatar(hub.x + hub.w / 2, hub.y + 118, now);
+                  drawChair(hub.x + 70, hub.y + 205, "#2f5f94");
+                  drawChair(hub.x + 230, hub.y + 205, "#2f5f94");
+                  drawRoundTable(hub.x + hub.w / 2, hub.y + 220);
+                  px(hub.x + 86, hub.y + 192, 166, 34, "#d2b07c", "#2a1b22", 4);
+                  for (let i = 0; i < 5; i += 1) {{
+                    px(hub.x + 100 + i * 27, hub.y + 202 + (i % 2) * 7, 18, 13, i % 2 ? "#ff74d4" : "#78f09b", "#2a1b22", 2);
+                  }}
                 }}
 
                 function drawCrown(x, y) {{
@@ -1478,6 +1585,171 @@ async def index(request: Request, service: TelegramRouterService = Depends(get_s
                 function drawQuestion(x, y, color) {{
                   text("?", x + 16, y - 8, 44, color);
                   px(x, y + 40, 62, 18, "#7a4328", "#2a1b22", 4);
+                }}
+
+                function drawMissionBoard(x, y) {{
+                  px(x, y, 208, 62, "#7a4328", "#2a1b22", 5);
+                  px(x + 10, y + 10, 188, 42, "#d6a071", "#4c2c20", 3);
+                  text("MISSION", x + 104, y + 16, 14, "#3a1f18", "center");
+                  text("CONNECT  CREATE  IMPACT", x + 104, y + 36, 11, "#3a1f18", "center");
+                }}
+
+                function drawSofa(x, y) {{
+                  softShadow(x + 70, y + 58, 96, 18, .2);
+                  px(x, y + 28, 140, 46, "#123d70", "#1a1420", 5);
+                  px(x + 10, y, 120, 42, "#194d83", "#1a1420", 5);
+                  for (let i = 0; i < 3; i += 1) px(x + 18 + i * 36, y + 34, 30, 30, "#225b94", "#102238", 3);
+                }}
+
+                function drawVending(x, y) {{
+                  px(x, y, 58, 104, "#242b44", "#15111a", 5);
+                  for (let row = 0; row < 3; row += 1) {{
+                    for (let col = 0; col < 3; col += 1) {{
+                      px(x + 12 + col * 13, y + 14 + row * 16, 8, 10, row % 2 ? "#ff74d4" : "#ffd15a", "#111827", 2);
+                    }}
+                  }}
+                  px(x + 44, y + 72, 6, 18, "#52e6f2");
+                }}
+
+                function drawWaterCooler(x, y) {{
+                  px(x + 10, y, 28, 28, "#64a7d8", "#15111a", 4);
+                  px(x + 14, y + 30, 20, 48, "#33556f", "#15111a", 4);
+                  px(x + 8, y + 78, 32, 12, "#1f2838", "#15111a", 3);
+                }}
+
+                function drawDoor(x, y, side) {{
+                  px(x, y, 34, 82, "#8f512d", "#2a1b22", 5);
+                  px(x + (side === "left" ? 22 : 7), y + 38, 5, 5, "#ffd15a");
+                  px(x + (side === "left" ? -8 : 34), y + 12, 10, 66, "#c17a43", "#2a1b22", 3);
+                }}
+
+                function drawPlant(x, y, scale = 1) {{
+                  ctx.save();
+                  ctx.translate(x, y);
+                  ctx.scale(scale, scale);
+                  px(-14, 38, 28, 24, "#8f512d", "#2a1b22", 4);
+                  px(-28, 12, 18, 38, "#2fa24d", "#17351e", 3);
+                  px(-8, 0, 18, 50, "#43ce61", "#17351e", 3);
+                  px(12, 12, 18, 38, "#62e978", "#17351e", 3);
+                  px(-17, -4, 13, 36, "#2b8f42", "#17351e", 3);
+                  ctx.restore();
+                }}
+
+                function drawCoffeeBar(x, y) {{
+                  px(x, y + 44, 116, 54, "#7a4328", "#2a1b22", 5);
+                  px(x + 10, y, 76, 52, "#2d2631", "#15111a", 4);
+                  text("COFFEE", x + 48, y + 8, 12, "#ffd15a", "center");
+                  text("FOCUS", x + 48, y + 23, 12, "#ffd15a", "center");
+                  px(x + 92, y + 22, 44, 76, "#aab1b8", "#2a1b22", 5);
+                  px(x + 100, y + 34, 18, 8, "#ff74d4");
+                  px(x + 22, y + 64, 22, 18, "#f7ead5", "#2a1b22", 3);
+                }}
+
+                function drawFoosball(x, y) {{
+                  px(x, y, 116, 62, "#7a4328", "#2a1b22", 5);
+                  px(x + 10, y + 10, 96, 42, "#2d8a62", "#17351e", 3);
+                  for (let i = 0; i < 4; i += 1) px(x + 18, y + 16 + i * 9, 82, 3, "#d6a071");
+                  px(x + 35, y + 24, 8, 8, "#ff74d4");
+                  px(x + 72, y + 34, 8, 8, "#ffd15a");
+                }}
+
+                function drawWelcomeMat(x, y) {{
+                  px(x, y, 108, 42, "#66345f", "#2a1b22", 5);
+                  text("WELCOME", x + 54, y + 8, 16, "#cfa4ff", "center");
+                  text("TEAM HQ", x + 54, y + 26, 10, "#f7ead5", "center");
+                }}
+
+                function drawContentPlan(x, y) {{
+                  px(x, y, 68, 92, "#f7ead5", "#2a1b22", 4);
+                  text("PLAN", x + 34, y + 8, 10, "#3a1f18", "center");
+                  ["IDEAS", "DESIGN", "LAUNCH"].forEach((item, i) => {{
+                    px(x + 10, y + 28 + i * 16, 7, 7, "#78f09b", "#3a1f18", 1);
+                    text(item, x + 23, y + 25 + i * 16, 8, "#3a1f18");
+                  }});
+                }}
+
+                function drawCommunicationsBoard(x, y) {{
+                  px(x, y, 118, 70, "#d6a071", "#2a1b22", 4);
+                  text("COMMUNICATIONS", x + 59, y + 8, 10, "#3a1f18", "center");
+                  ["MEDIA", "COMMUNITY", "EVENTS"].forEach((item, i) => text(item, x + 18, y + 25 + i * 13, 8, "#3a1f18"));
+                }}
+
+                function drawCalendar(x, y) {{
+                  px(x, y, 118, 78, "#f7ead5", "#2a1b22", 4);
+                  text("EDITORIAL", x + 59, y + 8, 10, "#3a1f18", "center");
+                  for (let row = 0; row < 3; row += 1) {{
+                    for (let col = 0; col < 5; col += 1) {{
+                      px(x + 14 + col * 18, y + 26 + row * 14, 12, 9, (row + col) % 2 ? "#ffd15a" : "#68a8ff", "#c69b68", 1);
+                    }}
+                  }}
+                }}
+
+                function drawStatusBoard(x, y) {{
+                  px(x, y, 76, 94, "#102238", "#15111a", 4);
+                  text("TEAM", x + 38, y + 8, 11, "#f7ead5", "center");
+                  Object.keys(rooms).slice(0, 5).forEach((id, i) => {{
+                    px(x + 10, y + 27 + i * 12, 7, 7, agentStates[id] === "paused" ? "#ffd15a" : "#78f09b");
+                    text(id.slice(0, 8), x + 22, y + 23 + i * 12, 8, "#cbe7ff");
+                  }});
+                }}
+
+                function drawPriorityBoard(x, y) {{
+                  px(x, y, 72, 94, "#102238", "#15111a", 4);
+                  text("TOP", x + 36, y + 8, 11, "#f7ead5", "center");
+                  ["ENGAGE", "CREATE", "SHARE", "GROW"].forEach((item, i) => {{
+                    px(x + 10, y + 29 + i * 14, 7, 7, "#78f09b");
+                    text(item, x + 22, y + 25 + i * 14, 8, "#cbe7ff");
+                  }});
+                }}
+
+                function drawWorldScreens(x, y, now) {{
+                  px(x, y, 54, 48, "#102238", "#15111a", 4);
+                  px(x + 64, y, 76, 48, "#102238", "#15111a", 4);
+                  for (let i = 0; i < 9; i += 1) {{
+                    px(x + 8 + (i * 17) % 38, y + 10 + (i * 11) % 28, 8, 5, i % 2 ? "#52e6f2" : "#78f09b");
+                    px(x + 74 + (i * 19) % 54, y + 9 + (i * 13) % 30, 10, 5, i % 2 ? "#68a8ff" : "#52e6f2");
+                  }}
+                  px(x + 10 + (Math.floor(now / 180) % 28), y + 34, 4, 4, "#ffd15a");
+                }}
+
+                function drawDesk(x, y, w, h) {{
+                  px(x, y + 20, w, h, "#7a4328", "#2a1b22", 5);
+                  px(x + 12, y, w - 24, 42, "#9b5b31", "#2a1b22", 5);
+                  px(x + 22, y + 12, 44, 28, "#102238", "#15111a", 4);
+                  px(x + w - 68, y + 12, 44, 28, "#102238", "#15111a", 4);
+                  px(x + w - 96, y + 34, 28, 22, "#f7ead5", "#2a1b22", 3);
+                  px(x + w - 84, y + 28, 18, 18, "#e85b75", "#2a1b22", 2);
+                }}
+
+                function drawOwnerAvatar(x, y, now) {{
+                  const bob = Math.floor(now / 240) % 2 ? -3 : 0;
+                  softShadow(x, y + 76, 44, 12, .25);
+                  px(x - 28, y + 44 + bob, 56, 48, "#ffd15a", "#15111a", 5);
+                  px(x - 22, y + 5 + bob, 44, 42, "#b9764f", "#15111a", 5);
+                  px(x - 26, y - 6 + bob, 52, 18, "#432c21", "#15111a", 4);
+                  px(x - 13, y + 20 + bob, 7, 7, "#f7ead5", "#15111a", 2);
+                  px(x + 10, y + 20 + bob, 7, 7, "#f7ead5", "#15111a", 2);
+                  px(x - 8, y + 34 + bob, 16, 4, "#7d2d2a");
+                  px(x - 42, y + 38 + bob, 18, 22, "#202432", "#15111a", 4);
+                  px(x + 24, y + 38 + bob, 18, 22, "#202432", "#15111a", 4);
+                }}
+
+                function drawChair(x, y, color) {{
+                  px(x, y, 52, 38, color, "#15111a", 5);
+                  px(x + 7, y - 20, 38, 28, shade(color, 22), "#15111a", 4);
+                }}
+
+                function drawRoundTable(x, y) {{
+                  softShadow(x, y + 18, 70, 14, .18);
+                  ctx.fillStyle = "#2f7f4f";
+                  ctx.beginPath();
+                  ctx.ellipse(x, y, 64, 32, 0, 0, Math.PI * 2);
+                  ctx.fill();
+                  ctx.strokeStyle = "#17351e";
+                  ctx.lineWidth = 5;
+                  ctx.stroke();
+                  px(x - 14, y - 12, 28, 20, "#9b5b31", "#2a1b22", 3);
+                  drawPlant(x + 4, y - 38, .45);
                 }}
 
                 function drawSprite(x, y, p, id, now, active, agentState) {{
@@ -1580,7 +1852,7 @@ async def index(request: Request, service: TelegramRouterService = Depends(get_s
 
                 function drawRoute(now) {{
                   if (communicationMode !== "ACTIVE_MODE" || !lastRoute || !rooms[lastRoute]) return;
-                  const from = {{ x: W / 2, y: H / 2 }};
+                  const from = {{ x: commandHub.x + commandHub.w / 2, y: commandHub.y + 126 }};
                   const to = centerOf(lastRoute);
                   const room = rooms[lastRoute];
                   const t = ((now - routeStarted) % 2200) / 2200;
@@ -1607,8 +1879,18 @@ async def index(request: Request, service: TelegramRouterService = Depends(get_s
                   drawBackground();
                   drawFloor();
                   Object.entries(rooms).forEach(([id, room]) => drawRoom(id, room, now));
+                  drawCommandHub(now);
                   drawRoute(now);
+                  drawModeOverlay();
+                  drawVignette();
                   requestAnimationFrame(drawLoop);
+                }}
+
+                function drawModeOverlay() {{
+                  if (communicationMode === "ACTIVE_MODE") return;
+                  px(392, 308, 336, 76, "rgba(6,8,20,.82)", "rgba(255,209,90,.52)", 4);
+                  text(communicationMode.replace("_", " "), W / 2, 323, 22, "#ffd15a", "center");
+                  text("La comunicación automática está limitada", W / 2, 352, 14, "#f7ead5", "center");
                 }}
 
                 async function pollScene() {{

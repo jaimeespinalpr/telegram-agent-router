@@ -1,3 +1,5 @@
+import asyncio
+
 from app.agents import Agent, AgentsConfig
 from app.settings import Settings
 from app.telegram_service import CommunicationMode, TelegramRouterService
@@ -61,3 +63,31 @@ def test_stop_communication_sets_receive_only_mode():
 
     assert service.state.mode == CommunicationMode.RECEIVE_ONLY
     assert set(service.state.agent_status.values()) == {"paused"}
+
+
+def test_external_message_with_mention_routes_to_mentioned_agent():
+    service = build_service()
+    sent: list[tuple[str, str]] = []
+
+    async def fake_send(agent: Agent, text: str) -> None:
+        sent.append((agent.id, text))
+
+    service._send_to_agent = fake_send  # type: ignore[method-assign]
+
+    asyncio.run(service._route_external_message("@cliente", "Hola @prpagydabot necesito PR"))
+
+    assert sent == [("prpagyda", "[from:@cliente -> prpagyda]\nHola @prpagydabot necesito PR")]
+
+
+def test_external_message_without_mention_is_ignored():
+    service = build_service()
+    sent: list[tuple[str, str]] = []
+
+    async def fake_send(agent: Agent, text: str) -> None:
+        sent.append((agent.id, text))
+
+    service._send_to_agent = fake_send  # type: ignore[method-assign]
+
+    asyncio.run(service._route_external_message("@cliente", "Hola Jaime"))
+
+    assert sent == []

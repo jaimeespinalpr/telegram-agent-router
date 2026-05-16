@@ -113,6 +113,9 @@ class TelegramRouterService:
 
             if sender_username in {normalize_username(u) for u in self.agents_config.owner_usernames}:
                 await self._route_owner_message(text)
+                return
+
+            await self._route_external_message(sender_username or "unknown", text)
         except Exception as exc:  # noqa: BLE001
             logger.exception("Failed to route Telegram message")
             self.state.last_error = str(exc)
@@ -154,6 +157,15 @@ class TelegramRouterService:
     async def _route_owner_message(self, text: str) -> None:
         target = self.detect_target_agent(text) or self.router_agent
         await self._send_to_agent(target, text)
+
+    async def _route_external_message(self, sender_username: str, text: str) -> None:
+        target = self.detect_target_agent(text)
+        if not target:
+            logger.info("External message did not mention a configured agent")
+            return
+
+        forwarded = f"[from:{sender_username} -> {target.id}]\n{text}"
+        await self._send_to_agent(target, forwarded)
 
     def detect_target_agent(self, text: str, exclude_agent_id: str | None = None) -> Agent | None:
         normalized_text = normalize_for_match(text)
