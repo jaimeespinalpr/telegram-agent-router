@@ -12,7 +12,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from app import auth
 from app.agents import load_agents_config
 from app.settings import Settings, get_settings
-from app.telegram_service import TelegramRouterService
+from app.telegram_service import CommunicationMode, TelegramRouterService
 
 
 def create_service(settings: Settings) -> TelegramRouterService:
@@ -102,10 +102,13 @@ async def index(request: Request, service: TelegramRouterService = Depends(get_s
         for agent in agents
     )
     rows = "\n".join(
-        f"<tr><td>{escape(agent.id)}</td><td>{escape(agent.telegram)}</td><td>{escape(agent.role)}</td></tr>"
+        f"<tr><td>{escape(agent.id)}</td><td>{escape(agent.telegram)}</td>"
+        f"<td>{escape(service.state.agent_status.get(agent.id, 'idle'))}</td>"
+        f"<td>{escape(agent.role)}</td></tr>"
         for agent in agents
     )
-    status = "running" if service.state.started else "stopped"
+    mode = service.state.mode.value
+    status = f"{'running' if service.state.started else 'stopped'} / {mode}"
     error = (
         f"<p class=\"error\"><strong>Last error:</strong> {escape(service.state.last_error)}</p>"
         if service.state.last_error
@@ -119,19 +122,45 @@ async def index(request: Request, service: TelegramRouterService = Depends(get_s
     )
     if not events:
         events = "<p class=\"muted\">No messages yet. Send an order or write to the director in Telegram.</p>"
+    workflow_steps = "".join(
+        f"<li><strong>{escape(title)}</strong><span>{escape(detail)}</span></li>"
+        for title, detail in [
+            ("1. Entrada", "Todos los mensajes entran primero por @jaimeespinalpr."),
+            ("2. Recepcion central", "La app escucha y registra cada mensaje recibido."),
+            ("3. Analisis automatico", "Detecta menciones, tags, nombres, palabras clave e intencion."),
+            ("4. Routing directo", "Si aparece un @tag de agente, se envia a ese agente."),
+            ("5. Routing por intencion", "Sin @tag, usa palabras clave y contexto basico."),
+            ("6. Bot principal", "Si hay duda, el destino es @Chattydabot."),
+            ("7. Router interno", "Las solicitudes entre agentes pasan por la app/router."),
+            ("8. Respuesta final", "Las respuestas vuelven al sistema principal antes de salir."),
+            ("9. Stop Communication", "Activa RECEIVE_ONLY_MODE y bloquea salidas."),
+            ("10. Resume Communication", "Vuelve a ACTIVE_MODE y permite envios."),
+            ("11. Estados globales", "ACTIVE, RECEIVE_ONLY, PAUSED y ERROR."),
+            ("12. Estados visuales", "idle, received, working, waiting, responding, paused y done."),
+            ("13. Animacion", "Rutas iluminadas solo cuando el sistema esta activo."),
+        ]
+    )
     latest_event = service.state.events[0] if service.state.events else None
     route_target = latest_event.actor if latest_event and latest_event.direction == "outgoing" else ""
     if route_target not in service.agents_config.by_id:
         route_target = ""
     scene_route = f"route-to-{escape(route_target)}" if route_target else "idle"
     scene_agents = [
-        {"id": agent.id, "name": agent.name, "telegram": agent.telegram, "kind": agent.kind}
+        {
+            "id": agent.id,
+            "name": agent.name,
+            "telegram": agent.telegram,
+            "kind": agent.kind,
+            "status": service.state.agent_status.get(agent.id, "idle"),
+        }
         for agent in agents
     ]
     scene_state = {
         "agents": scene_agents,
         "routeTarget": route_target,
         "latestText": latest_event.text if latest_event else "",
+        "mode": mode,
+        "agentStates": service.state.agent_status,
     }
     scene_state_json = json.dumps(scene_state)
     return HTMLResponse(
@@ -215,6 +244,17 @@ async def index(request: Request, service: TelegramRouterService = Depends(get_s
               background: var(--mint);
               box-shadow: 0 0 12px var(--mint);
             }}
+            .mode-controls {{
+              display: grid;
+              grid-template-columns: 1fr 1fr 1fr;
+              gap: 8px;
+              margin: 10px 0 14px;
+            }}
+            .mode-controls form {{ margin: 0; }}
+            .mode-controls button {{ margin-top: 0; }}
+            .button-stop {{ background: linear-gradient(#ff9d9d, #d84242); color: #240e13; }}
+            .button-resume {{ background: linear-gradient(#bdf7c8, #42c86d); color: #102316; }}
+            .button-pause {{ background: linear-gradient(#d8d0ff, #8d7ce5); color: #1b1634; }}
             .error {{
               margin: 10px 0;
               color: #ffd0d0;
@@ -1102,6 +1142,25 @@ async def index(request: Request, service: TelegramRouterService = Depends(get_s
               box-shadow: 0 8px 0 #201620;
             }}
             .panel h2 {{ font-size: 18px; margin-bottom: 12px; }}
+            .workflow {{
+              grid-column: 1 / -1;
+            }}
+            .workflow ol {{
+              display: grid;
+              grid-template-columns: repeat(2, minmax(0, 1fr));
+              gap: 8px;
+              margin: 0;
+              padding: 0;
+              list-style: none;
+            }}
+            .workflow li {{
+              border: 2px solid rgba(255,255,255,.13);
+              background: rgba(255,255,255,.05);
+              padding: 8px;
+              min-height: 64px;
+            }}
+            .workflow strong, .workflow span {{ display: block; }}
+            .workflow span {{ color: #d9c7ad; font-size: 13px; margin-top: 4px; }}
             .event {{
               border: 3px solid rgba(255,255,255,.13);
               background: rgba(255,255,255,.06);
@@ -1127,6 +1186,7 @@ async def index(request: Request, service: TelegramRouterService = Depends(get_s
               .shell {{ padding: 12px; }}
               .topbar {{ align-items: flex-start; flex-direction: column; }}
               .side-panel {{ grid-template-columns: 1fr; }}
+              .workflow ol {{ grid-template-columns: 1fr; }}
             }}
             .stage {{
               display: block;
@@ -1176,6 +1236,17 @@ async def index(request: Request, service: TelegramRouterService = Depends(get_s
               <p class="status">{status}</p>
             </header>
             {error}
+            <section class="mode-controls" aria-label="Communication controls">
+              <form action="/communication/stop" method="post">
+                <button class="button-stop" type="submit">STOP COMMUNICATION</button>
+              </form>
+              <form action="/communication/resume" method="post">
+                <button class="button-resume" type="submit">RESUME COMMUNICATION</button>
+              </form>
+              <form action="/communication/pause" method="post">
+                <button class="button-pause" type="submit">PAUSED MODE</button>
+              </form>
+            </section>
             <section class="stage scene {scene_route}">
               <canvas id="office-canvas" class="office-canvas" width="1120" height="900"></canvas>
               <div class="floor"></div>
@@ -1215,6 +1286,8 @@ async def index(request: Request, service: TelegramRouterService = Depends(get_s
                   prjimenezda: {{ x: 385, y: 632, w: 350, h: 220, color: "#76582a", accent: "#ffd15a", hair: "#2b191b", shirt: "#ffc52f", skin: "#b9764f", name: "Soporte", emoji: "E" }},
                 }};
                 const agentNames = Object.fromEntries(state.agents.map((agent) => [agent.id, agent.telegram]));
+                let agentStates = state.agentStates || {{}};
+                let communicationMode = state.mode || "ACTIVE_MODE";
                 let lastRoute = state.routeTarget || "";
                 let routeStarted = performance.now();
 
@@ -1325,6 +1398,7 @@ async def index(request: Request, service: TelegramRouterService = Depends(get_s
 
                 function drawRoom(id, room, now) {{
                   const glow = lastRoute === id;
+                  const agentState = agentStates[id] || "idle";
                   softShadow(room.x + room.w / 2, room.y + room.h + 10, room.w / 1.8, 32, .28);
                   px(room.x, room.y, room.w, room.h, "#4b3340", "#211722", 7);
                   const wallGradient = ctx.createLinearGradient(room.x, room.y, room.x, room.y + room.h);
@@ -1346,10 +1420,10 @@ async def index(request: Request, service: TelegramRouterService = Depends(get_s
                     ctx.shadowBlur = 0;
                   }}
                   drawProps(room, id, now);
-                  drawSprite(room.x + room.w * .46, room.y + room.h - 126, room, id, now, glow);
+                  drawSprite(room.x + room.w * .46, room.y + room.h - 126, room, id, now, glow, agentState);
                   px(room.x + 18, room.y + room.h - 42, room.w - 36, 28, "rgba(15,12,23,.82)", "rgba(255,255,255,.16)", 3);
                   text(agentNames[id] || id, room.x + 28, room.y + room.h - 36, 13, "#f7ead5");
-                  text(id, room.x + room.w - 28, room.y + room.h - 36, 13, room.accent, "right");
+                  text(agentState, room.x + room.w - 28, room.y + room.h - 36, 13, room.accent, "right");
                 }}
 
                 function drawProps(room, id, now) {{
@@ -1406,7 +1480,7 @@ async def index(request: Request, service: TelegramRouterService = Depends(get_s
                   px(x, y + 40, 62, 18, "#7a4328", "#2a1b22", 4);
                 }}
 
-                function drawSprite(x, y, p, id, now, active) {{
+                function drawSprite(x, y, p, id, now, active, agentState) {{
                   const bob = Math.floor(now / 260) % 2 ? -3 : 0;
                   if (active) ctx.shadowBlur = 16, ctx.shadowColor = p.accent;
                   const pants = id === "router" || id === "multi" ? "#2d2a37" : "#263148";
@@ -1437,6 +1511,11 @@ async def index(request: Request, service: TelegramRouterService = Depends(get_s
                   drawFace(x, y + bob, p, id);
                   drawHeadphones(x, y + bob, p, id);
                   drawLaptop(x + 38, y + 48 + bob, p, id);
+                  if (agentState === "paused" || communicationMode !== "ACTIVE_MODE") {{
+                    px(x + 52, y - 6 + bob, 34, 34, "#111827", p.accent, 4);
+                    px(x + 62, y + 3 + bob, 6, 16, p.accent);
+                    px(x + 72, y + 3 + bob, 6, 16, p.accent);
+                  }}
                   ctx.shadowBlur = 0;
                 }}
 
@@ -1500,7 +1579,7 @@ async def index(request: Request, service: TelegramRouterService = Depends(get_s
                 }}
 
                 function drawRoute(now) {{
-                  if (!lastRoute || !rooms[lastRoute]) return;
+                  if (communicationMode !== "ACTIVE_MODE" || !lastRoute || !rooms[lastRoute]) return;
                   const from = {{ x: W / 2, y: H / 2 }};
                   const to = centerOf(lastRoute);
                   const room = rooms[lastRoute];
@@ -1540,6 +1619,8 @@ async def index(request: Request, service: TelegramRouterService = Depends(get_s
                       lastRoute = next.routeTarget || "";
                       routeStarted = performance.now();
                     }}
+                    agentStates = next.agentStates || agentStates;
+                    communicationMode = next.mode || communicationMode;
                   }} catch (error) {{
                     console.warn("scene poll failed", error);
                   }}
@@ -1550,6 +1631,10 @@ async def index(request: Request, service: TelegramRouterService = Depends(get_s
               }})();
             </script>
             <section class="side-panel">
+              <div class="panel workflow">
+                <h2>Flujo de la app</h2>
+                <ol>{workflow_steps}</ol>
+              </div>
               <div class="panel">
                 <h2>Mensajes recientes</h2>
                 {events}
@@ -1557,7 +1642,7 @@ async def index(request: Request, service: TelegramRouterService = Depends(get_s
               <div class="panel">
                 <h2>Agentes</h2>
                 <table>
-                  <thead><tr><th>ID</th><th>Telegram</th><th>Rol</th></tr></thead>
+                  <thead><tr><th>ID</th><th>Telegram</th><th>Estado</th><th>Rol</th></tr></thead>
                   <tbody>{rows}</tbody>
                 </table>
                 <form action="/logout" method="post">
@@ -1582,6 +1667,39 @@ async def send_order(
         return RedirectResponse("/login", status_code=303)
     if message.strip():
         await service.send_owner_order(message.strip())
+    return RedirectResponse("/", status_code=303)
+
+
+@app.post("/communication/stop")
+async def stop_communication(
+    request: Request,
+    service: TelegramRouterService = Depends(get_service),
+):
+    if not auth.is_authenticated(request):
+        return RedirectResponse("/login", status_code=303)
+    service.set_mode(CommunicationMode.RECEIVE_ONLY)
+    return RedirectResponse("/", status_code=303)
+
+
+@app.post("/communication/resume")
+async def resume_communication(
+    request: Request,
+    service: TelegramRouterService = Depends(get_service),
+):
+    if not auth.is_authenticated(request):
+        return RedirectResponse("/login", status_code=303)
+    service.set_mode(CommunicationMode.ACTIVE)
+    return RedirectResponse("/", status_code=303)
+
+
+@app.post("/communication/pause")
+async def pause_communication(
+    request: Request,
+    service: TelegramRouterService = Depends(get_service),
+):
+    if not auth.is_authenticated(request):
+        return RedirectResponse("/login", status_code=303)
+    service.set_mode(CommunicationMode.PAUSED)
     return RedirectResponse("/", status_code=303)
 
 
@@ -1635,6 +1753,7 @@ async def logout_submit(request: Request):
 async def health(service: TelegramRouterService = Depends(get_service)):
     return {
         "telegram_started": service.state.started,
+        "mode": service.state.mode.value,
         "last_error": service.state.last_error,
         "agents": len(service.agents_config.agents),
     }
@@ -1686,6 +1805,8 @@ async def scene_state(service: TelegramRouterService = Depends(get_service)):
     return {
         "routeTarget": route_target,
         "latestText": latest_event.text if latest_event else "",
+        "mode": service.state.mode.value,
+        "agentStates": service.state.agent_status,
         "agents": [
             {
                 "id": agent.id,
@@ -1693,6 +1814,7 @@ async def scene_state(service: TelegramRouterService = Depends(get_service)):
                 "telegram": agent.telegram,
                 "kind": agent.kind,
                 "role": agent.role,
+                "status": service.state.agent_status.get(agent.id, "idle"),
             }
             for agent in service.agents_config.agents
         ],

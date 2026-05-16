@@ -11,6 +11,8 @@ class Agent(BaseModel):
     telegram: str
     kind: Literal["bot", "human"] = "bot"
     role: str = ""
+    aliases: list[str] = Field(default_factory=list)
+    keywords: list[str] = Field(default_factory=list)
 
 
 class AgentsConfig(BaseModel):
@@ -43,4 +45,3 @@ def load_agents_config(path: str) -> AgentsConfig:
 
     raw = yaml.safe_load(config_path.read_text(encoding="utf-8")) or {}
     return AgentsConfig.model_validate(raw)
-
