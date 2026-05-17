@@ -7,17 +7,17 @@
   <style>
     :root {
       color-scheme: dark;
-      --bg: #080914;
-      --panel: #171923;
-      --panel-2: #202433;
+      --bg: #070812;
+      --panel: #151826;
+      --panel-2: #202536;
+      --line: #394053;
       --text: #f4efe6;
-      --muted: #b9b3a6;
-      --line: #34394d;
+      --muted: #bdb5a7;
       --mint: #78f09b;
       --blue: #68a8ff;
-      --pink: #ff74d4;
       --cyan: #52e6f2;
       --gold: #ffd15a;
+      --rose: #ff7d8e;
     }
 
     * { box-sizing: border-box; }
@@ -26,217 +26,464 @@
       margin: 0;
       min-height: 100vh;
       background:
-        radial-gradient(circle at 14% 18%, rgba(120, 240, 155, .18), transparent 24rem),
-        radial-gradient(circle at 82% 16%, rgba(255, 116, 212, .16), transparent 24rem),
-        radial-gradient(circle at 54% 66%, rgba(82, 230, 242, .12), transparent 28rem),
-        linear-gradient(145deg, #080914 0%, #111426 58%, #070812 100%);
+        radial-gradient(circle at 18% 12%, rgba(120, 240, 155, .16), transparent 20rem),
+        radial-gradient(circle at 84% 18%, rgba(104, 168, 255, .16), transparent 22rem),
+        radial-gradient(circle at 54% 76%, rgba(82, 230, 242, .12), transparent 24rem),
+        linear-gradient(145deg, #070812, #111426 58%, #050610);
       color: var(--text);
       font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
     main {
-      width: min(1180px, calc(100% - 32px));
+      width: min(1220px, calc(100% - 28px));
       margin: 0 auto;
-      padding: 48px 0;
+      padding: 24px 0 44px;
     }
 
-    .hero {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(360px, 480px);
-      gap: 32px;
-      align-items: center;
-      min-height: calc(100vh - 96px);
+    header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 16px;
     }
+
+    h1, h2, p { margin: 0; }
 
     h1 {
-      margin: 0 0 18px;
-      font-size: clamp(42px, 7vw, 86px);
-      line-height: .95;
+      font-size: clamp(30px, 8vw, 70px);
+      line-height: .96;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin-bottom: 10px;
+      font-size: 18px;
     }
 
     p {
-      margin: 0;
       color: var(--muted);
-      font-size: 18px;
-      line-height: 1.6;
-    }
-
-    .actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 28px;
-    }
-
-    a, button {
-      color: inherit;
-      font: inherit;
-    }
-
-    .button {
-      display: inline-flex;
-      min-height: 46px;
-      align-items: center;
-      justify-content: center;
-      padding: 0 18px;
-      border: 1px solid var(--line);
-      background: var(--panel-2);
-      color: var(--text);
-      font-weight: 800;
-      text-decoration: none;
-      cursor: pointer;
-    }
-
-    .button.primary {
-      background: var(--mint);
-      border-color: var(--mint);
-      color: #06211f;
-    }
-
-    .launcher {
-      border: 1px solid var(--line);
-      background: rgba(23, 25, 35, .92);
-      box-shadow: 0 22px 80px rgba(0, 0, 0, .35);
-      padding: 22px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      color: var(--gold);
-      font-weight: 800;
-    }
-
-    input {
-      width: 100%;
-      min-height: 46px;
-      border: 1px solid var(--line);
-      background: #0f1220;
-      color: var(--text);
-      padding: 0 12px;
-      font: inherit;
-    }
-
-    .hint {
-      margin-top: 12px;
-      font-size: 14px;
-    }
-
-    .agent-grid {
-      display: grid;
-      gap: 12px;
-      margin-top: 22px;
-    }
-
-    .agent {
-      display: grid;
-      grid-template-columns: 12px minmax(0, 1fr);
-      gap: 12px;
-      padding: 14px;
-      background: #111421;
-      border: 1px solid var(--line);
-    }
-
-    .agent::before {
-      content: "";
-      width: 10px;
-      height: 10px;
-      margin-top: 7px;
-      background: var(--mint);
-      box-shadow: 0 0 16px rgba(120, 240, 155, .8);
-    }
-
-    .agent:nth-child(2)::before { background: var(--pink); box-shadow: 0 0 16px rgba(255, 116, 212, .8); }
-    .agent:nth-child(3)::before { background: var(--gold); box-shadow: 0 0 16px rgba(255, 209, 90, .8); }
-    .agent:nth-child(4)::before { background: var(--cyan); box-shadow: 0 0 16px rgba(82, 230, 242, .8); }
-
-    strong {
-      display: block;
-      margin-bottom: 4px;
-    }
-
-    span {
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.45;
-    }
-
-    .note {
-      margin-top: 24px;
-      padding: 16px;
-      border: 1px solid rgba(255, 209, 90, .35);
-      background: rgba(255, 209, 90, .08);
-      color: #f7dca0;
-      font-size: 15px;
+      line-height: 1.55;
     }
 
     code {
-      padding: 2px 6px;
+      color: var(--gold);
       background: #111421;
       border: 1px solid var(--line);
+      padding: 2px 6px;
     }
 
-    @media (max-width: 860px) {
-      .hero { grid-template-columns: 1fr; min-height: auto; }
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 38px;
+      padding: 0 12px;
+      border: 1px solid rgba(120, 240, 155, .55);
+      background: rgba(120, 240, 155, .12);
+      color: var(--mint);
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .status::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      background: currentColor;
+      box-shadow: 0 0 14px currentColor;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    button, .button {
+      min-height: 46px;
+      border: 1px solid var(--line);
+      padding: 0 14px;
+      color: var(--text);
+      background: var(--panel-2);
+      font: inherit;
+      font-weight: 850;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    button[data-mode="RECEIVE_ONLY_MODE"] { background: #6f2630; border-color: #b94a56; }
+    button[data-mode="ACTIVE_MODE"] { background: #1f5c38; border-color: #4dbd73; }
+    button[data-mode="PAUSED_MODE"] { background: #4a3d75; border-color: #8172c9; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 360px;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .lobby {
+      position: relative;
+      min-height: 660px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(0deg, rgba(255,255,255,.025) 0 1px, transparent 1px 6px),
+        radial-gradient(circle at 50% 48%, rgba(255, 209, 90, .1), transparent 18rem),
+        #0a0d18;
+    }
+
+    .floor {
+      position: absolute;
+      left: 18%;
+      right: 18%;
+      top: 32%;
+      bottom: 20%;
+      border: 6px solid #4b3340;
+      background:
+        repeating-linear-gradient(90deg, #9b5a31 0 56px, #854a2b 56px 62px),
+        #9b5a31;
+      box-shadow: inset 0 0 0 5px rgba(255,255,255,.05);
+    }
+
+    .hub {
+      position: absolute;
+      left: 50%;
+      top: 45%;
+      transform: translate(-50%, -50%);
+      width: 210px;
+      min-height: 130px;
+      border: 6px solid #2b1d27;
+      background: linear-gradient(#c0793e, #784027);
+      padding: 14px;
+      z-index: 5;
+      box-shadow: 0 14px 0 rgba(0,0,0,.22);
+    }
+
+    .hub strong { display: block; margin-bottom: 8px; }
+    .hub span { color: #fff4d8; font-size: 13px; }
+
+    .route {
+      position: absolute;
+      left: 50%;
+      top: 45%;
+      width: var(--route-width, 320px);
+      height: 0;
+      border-top: 5px dashed var(--route-color, var(--blue));
+      transform-origin: left center;
+      transform: rotate(var(--route-angle, -34deg));
+      opacity: .9;
+      filter: drop-shadow(0 0 9px var(--route-color, var(--blue)));
+      z-index: 4;
+      animation: routePulse 1.1s steps(2) infinite;
+    }
+
+    .mode-receive .route,
+    .mode-paused .route { display: none; }
+
+    .packet {
+      position: absolute;
+      left: 58%;
+      top: 38%;
+      width: 40px;
+      height: 26px;
+      border: 4px solid #241922;
+      background: #fff0c8;
+      z-index: 6;
+      animation: floatPacket 1.8s linear infinite;
+    }
+
+    .mode-receive .packet,
+    .mode-paused .packet { display: none; }
+
+    .room {
+      position: absolute;
+      width: 30%;
+      min-width: 210px;
+      min-height: 170px;
+      border: 6px solid #4b3340;
+      background: var(--room);
+      box-shadow: inset 0 -48px 0 rgba(88, 49, 31, .55), 0 12px 0 rgba(0,0,0,.2);
+      padding: 12px;
+    }
+
+    .router { left: 3%; top: 4%; --room: #284f36; --accent: var(--mint); }
+    .multi { right: 3%; top: 4%; --room: #223f70; --accent: var(--blue); }
+    .prpagyda { right: 3%; bottom: 6%; --room: #205958; --accent: var(--cyan); }
+    .prjimenezda { left: 35%; bottom: 4%; --room: #75582c; --accent: var(--gold); }
+
+    .room.active {
+      outline: 4px solid var(--accent);
+      box-shadow:
+        inset 0 -48px 0 rgba(88, 49, 31, .55),
+        0 0 24px var(--accent),
+        0 12px 0 rgba(0,0,0,.2);
+    }
+
+    .room header {
+      display: block;
+      margin: 0;
+    }
+
+    .room strong {
+      display: block;
+      color: #fff4d8;
+      font-size: 15px;
+    }
+
+    .room small {
+      color: var(--accent);
+      font-weight: 800;
+    }
+
+    .avatar {
+      position: absolute;
+      left: 44%;
+      bottom: 38px;
+      width: 54px;
+      height: 86px;
+      background:
+        linear-gradient(#f0b17a 0 34px, transparent 34px),
+        linear-gradient(90deg, transparent 0 9px, #2d2a37 9px 19px, transparent 19px 35px, #2d2a37 35px 45px, transparent 45px),
+        linear-gradient(var(--accent), var(--accent));
+      background-size: 54px 42px, 54px 86px, 54px 44px;
+      background-position: 0 0, 0 0, 0 42px;
+      background-repeat: no-repeat;
+      border-top: 8px solid #241922;
+      image-rendering: pixelated;
+      animation: bob 900ms steps(2) infinite;
+    }
+
+    .avatar::after {
+      content: attr(data-state);
+      position: absolute;
+      left: 50%;
+      bottom: -34px;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      padding: 4px 8px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(11, 13, 23, .86);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .mode-receive .avatar::before,
+    .mode-paused .avatar::before {
+      content: "II";
+      position: absolute;
+      right: -24px;
+      top: -16px;
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border: 3px solid var(--accent);
+      background: #111421;
+      color: var(--accent);
+      font-weight: 900;
+    }
+
+    .panel {
+      border: 1px solid var(--line);
+      background: rgba(21, 24, 38, .94);
+      padding: 14px;
+    }
+
+    .panel + .panel { margin-top: 12px; }
+
+    .event {
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.05);
+      padding: 10px;
+      margin-top: 8px;
+    }
+
+    .event strong { color: var(--gold); }
+    .event p { font-size: 14px; margin-top: 4px; }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .step {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.045);
+      padding: 12px;
+    }
+
+    .step strong { display: block; margin-bottom: 5px; color: var(--text); }
+    .step span { color: var(--muted); font-size: 13px; line-height: 1.45; }
+
+    @keyframes bob {
+      50% { transform: translateY(-4px); }
+    }
+
+    @keyframes routePulse {
+      50% { opacity: .45; }
+    }
+
+    @keyframes floatPacket {
+      0% { transform: translate(0, 0); }
+      50% { transform: translate(48px, 22px); }
+      100% { transform: translate(0, 0); }
+    }
+
+    @media (max-width: 920px) {
+      main { width: min(100% - 20px, 680px); padding-top: 16px; }
+      header { align-items: flex-start; flex-direction: column; }
+      .controls { grid-template-columns: 1fr; }
+      .layout { grid-template-columns: 1fr; }
+      .lobby { min-height: 760px; }
+      .floor { left: 7%; right: 7%; top: 34%; bottom: 24%; }
+      .room {
+        width: calc(50% - 16px);
+        min-width: 0;
+        min-height: 160px;
+      }
+      .router { left: 0; top: 0; }
+      .multi { right: 0; top: 0; }
+      .prpagyda { right: 0; bottom: 8px; }
+      .prjimenezda { left: 0; bottom: 8px; }
+      .hub { top: 48%; width: 190px; }
+      .route { --route-width: 190px; }
+      .steps { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
   <main>
-    <section class="hero">
+    <header>
       <div>
         <h1>Telegram Agent Router</h1>
         <p>
-          Panel visual para coordinar bots de Telegram desde la cuenta
-          <strong>@jaimeespinalpr</strong>. GitHub Pages muestra esta entrada publica;
-          el router real corre en un backend Python con FastAPI y Telethon.
-        </p>
-        <div class="actions">
-          <a class="button primary" href="https://github.com/jaimeespinalpr/telegram-agent-router">Ver repositorio</a>
-          <a class="button" href="https://github.com/jaimeespinalpr/telegram-agent-router/actions">Ver despliegues</a>
-        </div>
-        <p class="note">
-          GitHub Pages no puede ejecutar Telegram ni Python. Para que el boton abra la app real,
-          escribe aqui la URL publica del backend desplegado en Render, Railway, Fly.io o una VPS.
+          Vista publica en GitHub Pages para ver el lobby desde tu telefono.
+          La app real recibe mensajes por <code>@jaimeespinalpr</code> y enruta a los agentes.
         </p>
       </div>
+      <div id="status" class="status">ACTIVE_MODE</div>
+    </header>
 
-      <aside class="launcher">
-        <label for="backend-url">URL del backend</label>
-        <input id="backend-url" placeholder="https://tu-backend.example.com" />
-        <div class="actions">
-          <button class="button primary" id="open-backend" type="button">Abrir panel</button>
-          <button class="button" id="save-backend" type="button">Guardar URL</button>
-        </div>
-        <p class="hint">
-          Local: <code>http://127.0.0.1:8000</code>. Produccion: usa una URL HTTPS.
-        </p>
+    <section class="controls" aria-label="Communication controls">
+      <button type="button" data-mode="RECEIVE_ONLY_MODE">STOP COMMUNICATION</button>
+      <button type="button" data-mode="ACTIVE_MODE">RESUME COMMUNICATION</button>
+      <button type="button" data-mode="PAUSED_MODE">PAUSED MODE</button>
+    </section>
 
-        <div class="agent-grid" aria-label="Bots configurados">
-          <div class="agent"><div><strong>@chattydabot</strong><span>Director y router central.</span></div></div>
-          <div class="agent"><div><strong>@multida_bot</strong><span>Contenido, musica y marketing.</span></div></div>
-          <div class="agent"><div><strong>@ardidabot</strong><span>Ideas, creatividad y apoyo visual.</span></div></div>
-          <div class="agent"><div><strong>@prpagydabot</strong><span>PR, comunicaciones y comunidad.</span></div></div>
-          <div class="agent"><div><strong>@prjimenezdabot</strong><span>Plan editorial y coordinacion.</span></div></div>
+    <section class="layout">
+      <section id="lobby" class="lobby mode-active" aria-label="Lobby visual">
+        <div class="floor"></div>
+        <div id="route" class="route"></div>
+        <div class="packet"></div>
+
+        <article class="room router" data-agent="router">
+          <header><strong>@Chattydabot</strong><small>director/router</small></header>
+          <div class="avatar" data-state="idle"></div>
+        </article>
+
+        <article class="room multi active" data-agent="multi">
+          <header><strong>@Multida_bot</strong><small>marketing/contenido</small></header>
+          <div class="avatar" data-state="working"></div>
+        </article>
+
+        <article class="room prpagyda" data-agent="prpagyda">
+          <header><strong>@prpagydabot</strong><small>especializado</small></header>
+          <div class="avatar" data-state="idle"></div>
+        </article>
+
+        <article class="room prjimenezda" data-agent="prjimenezda">
+          <header><strong>@prjimenezdabot</strong><small>especializado</small></header>
+          <div class="avatar" data-state="idle"></div>
+        </article>
+
+        <div class="hub">
+          <strong>Consola central</strong>
+          <span>Ejemplo: "Necesito ideas para promocionar mi cancion" se enruta a @Multida_bot.</span>
         </div>
+      </section>
+
+      <aside>
+        <section class="panel">
+          <h2>Mensajes recientes</h2>
+          <div id="events">
+            <article class="event">
+              <strong>outgoing -> multi</strong>
+              <p>Necesito ideas para promocionar mi cancion.</p>
+            </article>
+            <article class="event">
+              <strong>incoming -> @jaimeespinalpr</strong>
+              <p>Mensaje recibido y analizado por la app.</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Regla de routing</h2>
+          <p>
+            Si hay mencion directa, se envia a ese agente. Si no hay mencion,
+            la app usa intencion y palabras clave. Si hay duda, cae en
+            <code>@Chattydabot</code>.
+          </p>
+        </section>
       </aside>
+    </section>
+
+    <section class="steps" aria-label="Flujo de la app">
+      <div class="step"><strong>1. Entrada</strong><span>Todos los mensajes entran por @jaimeespinalpr.</span></div>
+      <div class="step"><strong>2. Recepcion</strong><span>La app escucha, registra y muestra mensajes en el lobby.</span></div>
+      <div class="step"><strong>3. Analisis</strong><span>Detecta menciones, tags, nombres, palabras clave e intencion.</span></div>
+      <div class="step"><strong>4. Routing</strong><span>Envia el mensaje al agente correcto o al director si hay duda.</span></div>
+      <div class="step"><strong>5. Router interno</strong><span>Los agentes no se escriben directo; pasan por la app.</span></div>
+      <div class="step"><strong>6. Stop</strong><span>RECEIVE_ONLY_MODE recibe y registra, pero no envia nada.</span></div>
+      <div class="step"><strong>7. Resume</strong><span>ACTIVE_MODE vuelve a enviar, redirigir y responder.</span></div>
+      <div class="step"><strong>8. Visual</strong><span>Los avatares cambian entre idle, working, waiting, paused y done.</span></div>
     </section>
   </main>
 
   <script>
-    const input = document.getElementById("backend-url");
-    const saved = window.localStorage.getItem("telegram-router-backend") || "http://127.0.0.1:8000";
-    input.value = saved;
+    const status = document.getElementById("status");
+    const lobby = document.getElementById("lobby");
+    const route = document.getElementById("route");
+    const events = document.getElementById("events");
+    const rooms = Array.from(document.querySelectorAll(".room"));
+    const avatars = Array.from(document.querySelectorAll(".avatar"));
 
-    document.getElementById("save-backend").addEventListener("click", () => {
-      window.localStorage.setItem("telegram-router-backend", input.value.trim());
-    });
+    function addEvent(label, detail) {
+      const item = document.createElement("article");
+      item.className = "event";
+      item.innerHTML = `<strong>${label}</strong><p>${detail}</p>`;
+      events.prepend(item);
+    }
 
-    document.getElementById("open-backend").addEventListener("click", () => {
-      const url = input.value.trim();
-      if (!url) return;
-      window.localStorage.setItem("telegram-router-backend", url);
-      window.location.href = url;
+    function setMode(mode) {
+      status.textContent = mode;
+      lobby.classList.toggle("mode-active", mode === "ACTIVE_MODE");
+      lobby.classList.toggle("mode-receive", mode === "RECEIVE_ONLY_MODE");
+      lobby.classList.toggle("mode-paused", mode === "PAUSED_MODE");
+
+      if (mode === "ACTIVE_MODE") {
+        avatars.forEach((avatar) => avatar.dataset.state = "idle");
+        document.querySelector(".multi .avatar").dataset.state = "working";
+        route.style.setProperty("--route-angle", "-34deg");
+        route.style.setProperty("--route-color", "var(--blue)");
+        rooms.forEach((room) => room.classList.toggle("active", room.dataset.agent === "multi"));
+        addEvent("system -> ACTIVE_MODE", "Envios y rutas automaticas activadas.");
+        return;
+      }
+
+      avatars.forEach((avatar) => avatar.dataset.state = mode === "PAUSED_MODE" ? "paused" : "waiting");
+      rooms.forEach((room) => room.classList.remove("active"));
+      addEvent(`system -> ${mode}`, "La app puede recibir y mostrar mensajes, pero no dispara envios automaticos.");
+    }
+
+    document.querySelectorAll("button[data-mode]").forEach((button) => {
+      button.addEventListener("click", () => setMode(button.dataset.mode));
     });
   </script>
 </body>
